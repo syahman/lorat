@@ -28,7 +28,7 @@ You need a modern web browser (Chrome, Firefox, Safari, Edge) to run this applic
 
 1.  **Download:** Clone or download this repository to your local machine.
     ```bash
-    git clone https://github.com/your-username/lorat-form-builder.git
+    [git clone https://github.com/your-username/lorat-form-builder.git](https://github.com/syahman/lorat.git)
     ```
 2.  **Open:** Locate the main HTML file (e.g., `lorat.html` or `index.html`) in your file explorer.
 3.  **Launch:** Double-click the HTML file to open it in your default web browser.
