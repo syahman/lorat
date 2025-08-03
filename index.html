@@ -1,0 +1,2144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lorat Form Builder</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --light: #ecf0f1;
+            --dark: #34495e;
+
+            /* Light mode specific colors */
+            --bg-color: #f8f9fa;
+            --text-color: #2d3748;
+            --border-color: #e2e8f0;
+            --header-bg: white;
+            --toolbar-bg: white;
+            --section-bg: white;
+            --property-panel-bg: white;
+            --input-bg: white;
+            --input-text: #2d3748;
+            --placeholder-color: #a0aec0;
+            --element-hover-bg: #f8fafc;
+            --element-selected-bg: #f0f9ff;
+            --code-block-bg: #1e1e1e;
+            --code-block-text: #d4d4d4;
+        }
+
+        /* Dark Mode Variables */
+        .dark-mode {
+            --bg-color: #1a202c;
+            --text-color: #e2e8f0;
+            --border-color: #2d3748;
+            --header-bg: #2d3748;
+            --toolbar-bg: #2d3748;
+            --section-bg: #2d3748;
+            --property-panel-bg: #2d3748;
+            --input-bg: #4a5568;
+            --input-text: #e2e8f0;
+            --placeholder-color: #a0aec0;
+            --element-hover-bg: #4a5568;
+            --element-selected-bg: #4a5568; /* Adjusted for dark mode */
+            --code-block-bg: #2d3748;
+            --code-block-text: #e2e8f0;
+        }
+
+        /* Apply base styles using variables */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            transition: background-color 0.3s, color 0.3s; /* Smooth transition */
+        }
+
+        /* --- DARK MODE SPECIFIC STYLES --- */
+        .dark-mode .toolbar {
+            background: var(--toolbar-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-mode .toolbar-item {
+            color: var(--text-color);
+        }
+
+        .dark-mode .toolbar-item:hover {
+            background-color: var(--element-hover-bg);
+            color: var(--secondary);
+        }
+
+        .dark-mode .section {
+            background: var(--section-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .dark-mode .section-header {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .dark-mode .section-title {
+            color: var(--text-color);
+        }
+
+        .dark-mode .section-action {
+            color: #a0aec0;
+        }
+
+        .dark-mode .section-action:hover {
+            background-color: var(--element-hover-bg);
+            color: var(--text-color);
+        }
+
+        .dark-mode .form-element {
+            border: 1px dashed var(--border-color);
+        }
+
+        .dark-mode .form-element:hover {
+            border-color: var(--secondary);
+            background-color: var(--element-hover-bg);
+        }
+
+        .dark-mode .form-element.selected {
+            border-color: var(--secondary);
+            background-color: var(--element-selected-bg);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.4); /* Adjusted opacity */
+        }
+
+        .dark-mode .element-title {
+            color: var(--text-color);
+        }
+
+        .dark-mode .element-action {
+            color: #a0aec0;
+        }
+
+        .dark-mode .element-action:hover {
+            background-color: var(--element-hover-bg);
+            color: var(--text-color);
+        }
+
+        .dark-mode .property-panel {
+            background: var(--property-panel-bg);
+            box-shadow: -1px 0 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-mode .property-panel-title {
+            color: var(--text-color);
+        }
+
+        .dark-mode .property-panel-close {
+            color: #a0aec0;
+        }
+
+        .dark-mode .property-panel-close:hover {
+            color: var(--danger);
+        }
+
+        .dark-mode .property-title {
+            color: var(--text-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .dark-mode .form-control {
+            background-color: var(--input-bg);
+            color: var(--input-text);
+            border: 1px solid var(--border-color);
+        }
+
+        .dark-mode .form-control:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3); /* Adjusted opacity */
+        }
+
+        .dark-mode .form-control::placeholder {
+            color: var(--placeholder-color);
+        }
+
+        .dark-mode .header {
+            background: var(--header-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-mode .header-title {
+            color: var(--text-color);
+        }
+
+        .dark-mode .header-caption {
+            color: #a0aec0;
+        }
+
+        .dark-mode .section-placeholder {
+            color: #a0aec0;
+            border: 1px dashed #4a5568;
+        }
+
+        .dark-mode .element-placeholder {
+            color: #a0aec0;
+        }
+
+        .dark-mode .preview-modal {
+            background: rgba(0, 0, 0, 0.9); /* Darker overlay */
+        }
+
+        .dark-mode .preview-header {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .dark-mode .preview-footer {
+            border-top: 1px solid var(--border-color);
+        }
+
+        .dark-mode .toggle-properties {
+            background: var(--header-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-mode .toggle-properties:hover {
+            background: var(--element-hover-bg);
+        }
+
+        .dark-mode .visibility-rule {
+            background: var(--element-hover-bg);
+            border: 1px solid var(--border-color);
+        }
+
+        .dark-mode .export-modal {
+            background: rgba(0, 0, 0, 0.9); /* Darker overlay */
+        }
+
+        .dark-mode .export-content {
+            background: var(--section-bg);
+        }
+
+        .dark-mode .export-header {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .dark-mode .export-tabs {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .dark-mode .export-tab {
+            color: #a0aec0;
+        }
+
+        .dark-mode .export-tab.active {
+            color: var(--secondary);
+            border-bottom: 2px solid var(--secondary);
+        }
+
+        .dark-mode .export-footer {
+            border-top: 1px solid var(--border-color);
+        }
+
+        .dark-mode .code-block {
+            background: var(--code-block-bg);
+            color: var(--code-block-text);
+        }
+
+        .dark-mode .copy-button {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .dark-mode .copy-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .dark-mode .toast {
+            /* Toast background is already defined by its type (success/danger) */
+        }
+
+        .dark-mode .toast.error {
+            background: var(--danger);
+        }
+        /* --- END DARK MODE SPECIFIC STYLES --- */
+
+
+        .toolbar {
+            width: 60px;
+            background: var(--toolbar-bg); /* Use variable */
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            height: calc(100vh - 60px);
+            position: fixed;
+            top: 60px;
+            left: 0;
+            z-index: 10;
+            padding-top: 10px;
+            transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transition */
+        }
+        .toolbar-item {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 8px auto;
+            border-radius: 6px;
+            cursor: grab;
+            transition: all 0.2s;
+            color: var(--dark); /* Use variable */
+        }
+        .toolbar-item:hover {
+            background-color: var(--light); /* Use variable */
+            color: var(--secondary); /* Use variable */
+        }
+        .toolbar-item:active {
+            cursor: grabbing;
+        }
+        .main-content {
+            margin-left: 60px;
+            padding: 20px;
+            padding-top: 80px;
+            transition: margin-right 0.3s ease;
+        }
+        .main-content.with-properties {
+            margin-right: 300px;
+        }
+        .section {
+            background: var(--section-bg); /* Use variable */
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color); /* Use variable */
+            transition: all 0.2s, background-color 0.3s, border-color 0.3s, box-shadow 0.3s; /* Smooth transition */
+        }
+        .section.drag-over {
+            border-color: var(--secondary);
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+        .section-header {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color); /* Use variable */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+        }
+        .section-title {
+            font-weight: 600;
+            color: var(--dark); /* Use variable */
+            font-size: 15px;
+        }
+        .section-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .section-action {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #718096;
+            transition: all 0.2s;
+        }
+        .section-action:hover {
+            background-color: #f1f5f9;
+            color: var(--dark); /* Use variable */
+        }
+        .section-content {
+            padding: 15px;
+        }
+        .form-element {
+            padding: 12px;
+            border: 1px dashed var(--border-color); /* Use variable */
+            border-radius: 4px;
+            margin-bottom: 10px;
+            position: relative;
+            transition: all 0.2s, background-color 0.3s, border-color 0.3s; /* Smooth transition */
+            cursor: move;
+        }
+        .form-element:hover {
+            border-color: var(--secondary);
+            background-color: var(--element-hover-bg); /* Use variable */
+        }
+        .form-element.selected {
+            border-color: var(--secondary);
+            background-color: var(--element-selected-bg); /* Use variable */
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        .element-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .element-title {
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--dark); /* Use variable */
+        }
+        .element-actions {
+            display: flex;
+            gap: 6px;
+        }
+        .element-action {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 3px;
+            cursor: pointer;
+            color: #718096;
+            font-size: 11px;
+        }
+        .element-action:hover {
+            background-color: #e2e8f0;
+            color: var(--dark); /* Use variable */
+        }
+        .property-panel {
+            width: 300px;
+            background: var(--property-panel-bg); /* Use variable */
+            box-shadow: -1px 0 3px rgba(0,0,0,0.05);
+            height: calc(100vh - 60px);
+            position: fixed;
+            top: 60px;
+            right: 0;
+            z-index: 10;
+            padding: 20px;
+            overflow-y: auto;
+            transition: transform 0.3s ease, background-color 0.3s, box-shadow 0.3s; /* Smooth transition */
+        }
+        .property-panel.collapsed {
+            transform: translateX(100%);
+        }
+        .property-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color); /* Use variable */
+        }
+        .property-panel-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark); /* Use variable */
+        }
+        .property-panel-close {
+            cursor: pointer;
+            color: #718096;
+            font-size: 18px;
+        }
+        .property-panel-close:hover {
+            color: var(--danger); /* Use variable */
+        }
+        .property-group {
+            margin-bottom: 20px;
+        }
+        .property-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark); /* Use variable */
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color); /* Use variable */
+        }
+        .form-control {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid var(--border-color); /* Use variable */
+            border-radius: 4px;
+            font-size: 14px;
+            margin-bottom: 12px;
+            transition: border 0.2s, background-color 0.3s, color 0.3s, box-shadow 0.3s; /* Smooth transition */
+            background-color: var(--input-bg); /* Use variable */
+            color: var(--input-text); /* Use variable */
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        .form-control::placeholder {
+             color: var(--placeholder-color); /* Use variable */
+        }
+        .btn {
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-weight: 500;
+        }
+        .btn-primary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #d1d5db;
+            color: #4b5563;
+        }
+        .btn-outline:hover {
+            background-color: #f9fafb;
+        }
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: var(--header-bg); /* Use variable */
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            transition: background-color 0.3s, box-shadow 0.3s; /* Smooth transition */
+        }
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark); /* Use variable */
+        }
+        .header-caption {
+            font-size: 12px;
+            color: #718096;
+            margin-left: 10px;
+        }
+        .header-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 10px;
+            align-items: center; /* Align items vertically */
+        }
+         /* Style for the hidden file input */
+        #import-json-input {
+            display: none;
+        }
+        .canvas {
+            min-height: calc(100vh - 140px);
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        .section-placeholder {
+            text-align: center;
+            padding: 40px 20px;
+            color: #94a3b8;
+            border: 1px dashed #cbd5e1;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        .element-placeholder {
+            text-align: center;
+            padding: 20px;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+        /* --- MODIFIED PREVIEW MODAL STYLES --- */
+        .preview-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white; /* Changed to white background */
+            z-index: 100;
+            display: flex;
+            flex-direction: column; /* Stack header, body, footer vertically */
+            height: 100vh; /* Full viewport height */
+            width: 100vw;  /* Full viewport width */
+            transition: background-color 0.3s; /* Smooth transition */
+        }
+        .preview-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0; /* Prevent header from shrinking */
+        }
+        .preview-body {
+            padding: 20px;
+            overflow-y: auto; /* Allow scrolling for long forms */
+            flex-grow: 1; /* Take up remaining space */
+        }
+        .preview-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            flex-shrink: 0; /* Prevent footer from shrinking */
+        }
+        /* --- END MODIFIED PREVIEW MODAL STYLES --- */
+
+        .drag-handle {
+            cursor: move;
+            color: #94a3b8;
+            margin-right: 8px;
+        }
+        .drag-over {
+            border: 2px dashed var(--secondary) !important;
+            background-color: rgba(52, 152, 219, 0.1) !important;
+        }
+        .drop-zone {
+            min-height: 50px;
+            transition: all 0.2s;
+            border-radius: 4px;
+        }
+        .drop-zone.drag-over {
+            background-color: rgba(52, 152, 219, 0.1);
+            border: 2px dashed var(--secondary);
+        }
+        .toggle-properties {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 8px 12px;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            z-index: 5;
+            transition: all 0.3s ease, background-color 0.3s, border-color 0.3s, box-shadow 0.3s; /* Smooth transition */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+        .toggle-properties:hover {
+            background: #f1f5f9;
+        }
+        .toggle-properties i {
+            font-size: 16px;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .checkbox-label input {
+            margin-right: 8px;
+        }
+        .date-time-preview {
+            display: flex;
+            gap: 10px;
+        }
+        .date-time-preview .form-control {
+            flex: 1;
+        }
+        .visibility-rule {
+            background: #f8fafc;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #e2e8f0;
+        }
+        .rule-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .rule-item:last-child {
+            margin-bottom: 0;
+        }
+        .rule-label {
+            font-size: 13px;
+            color: #4b5563;
+            margin-right: 8px;
+            min-width: 80px;
+        }
+        .rule-value {
+            flex: 1;
+        }
+        .add-rule {
+            color: var(--secondary);
+            font-size: 13px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            margin-top: 8px;
+        }
+        .add-rule:hover {
+            text-decoration: underline;
+        }
+        .hidden-label {
+            opacity: 0.7;
+            font-style: italic;
+        }
+        .hidden-section-title {
+            opacity: 0.7;
+            font-style: italic;
+        }
+        .export-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            transition: background-color 0.3s; /* Smooth transition */
+        }
+        .export-content {
+            background: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s; /* Smooth transition */
+        }
+        .export-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .export-tabs {
+            display: flex;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .export-tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #718096;
+            border-bottom: 2px solid transparent;
+        }
+        .export-tab.active {
+            color: var(--secondary);
+            border-bottom: 2px solid var(--secondary);
+        }
+        .export-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .export-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .code-block {
+            background: var(--code-block-bg); /* Use variable */
+            color: var(--code-block-text); /* Use variable */
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            max-height: 500px;
+            white-space: pre-wrap; /* Allow wrapping for long lines */
+            transition: background-color 0.3s, color 0.3s; /* Smooth transition */
+        }
+        .copy-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: background-color 0.3s; /* Smooth transition */
+        }
+        .copy-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .relative {
+            position: relative;
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 4px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.3s; /* Smooth transition */
+        }
+        /* Import Error Toast */
+        .toast.error {
+            background: var(--danger);
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Hidden File Input for Import -->
+        <input type="file" id="import-json-input" accept=".json" @change="handleImportJson">
+
+        <!-- Header -->
+        <div class="header">
+            <div class="flex items-center">
+                <div class="header-title">Lorat Form Builder</div>
+                <div class="header-caption">a minimalist lazy html form designer</div>
+            </div>
+            <div class="header-actions">
+                 <!-- Dark Mode Toggle Button -->
+                <button class="btn btn-outline" @click="toggleDarkMode" :title="darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+                    <i :class="darkMode ? 'fas fa-sun' : 'fas fa-moon'"></i>
+                </button>
+                <button class="btn btn-outline" @click="triggerImport">
+                    <i class="fas fa-file-import mr-2"></i> Import
+                </button>
+                <button class="btn btn-outline">
+                    <i class="fas fa-save mr-2"></i> Save
+                </button>
+                <button class="btn btn-primary" @click="exportForm">
+                    <i class="fas fa-file-export mr-2"></i> Export
+                </button>
+                <button class="btn btn-outline" @click="previewMode = !previewMode">
+                    <i class="fas fa-eye mr-2"></i> {{ previewMode ? 'Edit' : 'Preview' }}
+                </button>
+            </div>
+        </div>
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div
+                v-for="item in toolbarItems"
+                :key="item.type"
+                class="toolbar-item"
+                draggable="true"
+                @dragstart="startToolDrag($event, item.type)"
+                @click="handleToolClick(item.type)"
+                :title="item.label"
+            >
+                <i :class="item.icon"></i>
+            </div>
+        </div>
+        <!-- Toggle Properties Button -->
+        <div
+            class="toggle-properties"
+            @click="propertiesPanelCollapsed = !propertiesPanelCollapsed"
+            v-show="propertiesPanelCollapsed"
+        >
+            <i class="fas fa-cog"></i>
+        </div>
+        <!-- Main Content -->
+        <div
+            class="main-content"
+            :class="{ 'with-properties': !propertiesPanelCollapsed }"
+        >
+            <div class="canvas">
+                <!-- Section Placeholder -->
+                <div v-if="sections.length === 0" class="section-placeholder">
+                    <i class="fas fa-plus-circle text-3xl mb-3 text-gray-400"></i>
+                    <p class="text-lg">Add your first section</p>
+                    <p class="text-sm mt-1">Click the section icon in the toolbar</p>
+                </div>
+                <!-- Sections -->
+                <div
+                    v-for="(section, sectionIndex) in sections"
+                    :key="section.id"
+                    class="section"
+                    :class="{ 'drag-over': dragOverSection === section.id }"
+                    @dragover.prevent="handleSectionDragOver($event, section)"
+                    @drop="handleSectionDrop($event, section)"
+                >
+                    <div class="section-header" @click="selectSection(section)">
+                        <div class="section-title" :class="{ 'hidden-section-title': section.hideTitle }">
+                            <i class="fas fa-grip-lines drag-handle"></i>
+                            <span v-if="!section.hideTitle">{{ section.title || 'Untitled Section' }}</span>
+                            <span v-else><em>Hidden Section Title</em></span>
+                        </div>
+                        <div class="section-actions">
+                            <div class="section-action" @click.stop="addSection(sectionIndex + 1)">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                            <div class="section-action" @click.stop="duplicateSection(section)">
+                                <i class="fas fa-copy"></i>
+                            </div>
+                            <div class="section-action" @click.stop="deleteSection(sectionIndex)">
+                                <i class="fas fa-trash"></i>
+                            </div>
+                            <div class="section-action" @click.stop="toggleSection(section)">
+                                <i :class="section.collapsed ? 'fas fa-chevron-down' : 'fas fa-chevron-up'"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-content" v-show="!section.collapsed">
+                        <!-- Element Placeholder -->
+                        <div v-if="section.elements.length === 0" class="element-placeholder">
+                            <i class="fas fa-mouse-pointer mr-2"></i>
+                            Drag elements here from the toolbar
+                        </div>
+                        <!-- Elements -->
+                        <div class="drop-zone"
+                            @dragover.prevent="handleElementDragOver($event, section, -1)"
+                            @drop="handleElementDrop($event, section, -1)"
+                            :class="{ 'drag-over': dragOverElementIndex === -1 && dragOverSection === section.id }"
+                        ></div>
+                        <div
+                            v-for="(element, elementIndex) in section.elements"
+                            :key="element.id"
+                            class="form-element"
+                            :class="{
+                                'selected': selectedElement && selectedElement.id === element.id,
+                                'dragging': draggingElement === element.id
+                            }"
+                            draggable="true"
+                            @dragstart="startElementDrag($event, element, section, elementIndex)"
+                            @dragover.prevent="handleElementDragOver($event, section, elementIndex)"
+                            @drop="handleElementDrop($event, section, elementIndex)"
+                            @dragend="endElementDrag"
+                            @click="selectElement(element, section)"
+                        >
+                            <div class="element-header">
+                                <div class="element-title" :class="{ 'hidden-label': element.hideLabel }">
+                                    <i class="fas fa-grip-lines drag-handle"></i>
+                                    <span v-if="!element.hideLabel">{{ element.label }}</span>
+                                    <span v-else><em>Hidden Label</em></span>
+                                </div>
+                                <div class="element-actions">
+                                    <div class="element-action" @click.stop="moveElementUp(section, elementIndex)">
+                                        <i class="fas fa-arrow-up"></i>
+                                    </div>
+                                    <div class="element-action" @click.stop="moveElementDown(section, elementIndex)">
+                                        <i class="fas fa-arrow-down"></i>
+                                    </div>
+                                    <div class="element-action" @click.stop="duplicateElement(section, element)">
+                                        <i class="fas fa-copy"></i>
+                                    </div>
+                                    <div class="element-action" @click.stop="deleteElement(section, elementIndex)">
+                                        <i class="fas fa-trash"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="element-preview">
+                                <div v-if="element.type === 'text' || element.type === 'email' || element.type === 'password'">
+                                    <input
+                                        type="text"
+                                        :placeholder="element.placeholder || 'Enter text'"
+                                        class="form-control"
+                                        readonly
+                                    >
+                                </div>
+                                <div v-else-if="element.type === 'textarea'">
+                                    <textarea
+                                        :placeholder="element.placeholder || 'Enter text'"
+                                        class="form-control"
+                                        rows="3"
+                                        readonly
+                                    ></textarea>
+                                </div>
+                                <div v-else-if="element.type === 'select'">
+                                    <select class="form-control" disabled>
+                                        <option>{{ element.placeholder || 'Select option' }}</option>
+                                        <option v-for="option in element.options" :key="option.value">
+                                            {{ option.label }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div v-else-if="element.type === 'checkbox'">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="mr-2" disabled>
+                                        <span>{{ element.label }}</span>
+                                    </label>
+                                </div>
+                                <div v-else-if="element.type === 'radio'">
+                                    <div v-for="option in element.options" :key="option.value" class="flex items-center mb-1">
+                                        <input type="radio" class="mr-2" name="radio-preview" disabled>
+                                        <span>{{ option.label }}</span>
+                                    </div>
+                                </div>
+                                <div v-else-if="element.type === 'button'">
+                                    <button class="btn btn-primary w-full">
+                                        {{ element.label }}
+                                    </button>
+                                </div>
+                                <div v-else-if="element.type === 'datepicker'">
+                                    <div class="date-time-preview">
+                                        <input
+                                            type="text"
+                                            :placeholder="element.placeholder || 'Select date'"
+                                            class="form-control"
+                                            readonly
+                                        >
+                                        <button class="btn btn-outline">
+                                            <i class="fas fa-calendar"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div v-else-if="element.type === 'timepicker'">
+                                    <div class="date-time-preview">
+                                        <input
+                                            type="text"
+                                            :placeholder="element.placeholder || 'Select time'"
+                                            class="form-control"
+                                            readonly
+                                        >
+                                        <button class="btn btn-outline">
+                                            <i class="fas fa-clock"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="drop-zone"
+                                @dragover.prevent="handleElementDragOver($event, section, elementIndex)"
+                                @drop="handleElementDrop($event, section, elementIndex)"
+                                :class="{ 'drag-over': dragOverElementIndex === elementIndex && dragOverSection === section.id }"
+                            ></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Property Panel -->
+        <div
+            class="property-panel"
+            :class="{ 'collapsed': propertiesPanelCollapsed }"
+        >
+            <div class="property-panel-header">
+                <div class="property-panel-title">
+                    {{ selectedElement ? 'Element Properties' : selectedSection ? 'Section Properties' : 'Properties' }}
+                </div>
+                <div class="property-panel-close" @click="propertiesPanelCollapsed = true">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+            <div v-if="selectedElement">
+                <div class="property-group">
+                    <div class="property-title">Element Settings</div>
+                    <div class="mb-3">
+                        <label class="block text-sm mb-1">Label</label>
+                        <input
+                            v-model="selectedElement.label"
+                            type="text"
+                            class="form-control"
+                            placeholder="Element label"
+                        >
+                    </div>
+                    <div class="checkbox-label">
+                        <input
+                            v-model="selectedElement.hideLabel"
+                            type="checkbox"
+                            id="hide-label-checkbox"
+                        >
+                        <label for="hide-label-checkbox">Hide Label</label>
+                    </div>
+                    <div class="mb-3">
+                        <label class="block text-sm mb-1">Name (ID)</label>
+                        <input
+                            v-model="selectedElement.name"
+                            type="text"
+                            class="form-control"
+                            placeholder="Element name"
+                        >
+                    </div>
+                    <div v-if="selectedElement.type !== 'button'" class="mb-3">
+                        <label class="block text-sm mb-1">Placeholder</label>
+                        <input
+                            v-model="selectedElement.placeholder"
+                            type="text"
+                            class="form-control"
+                            placeholder="Placeholder text"
+                        >
+                    </div>
+                    <div v-if="selectedElement.type !== 'button'" class="mb-3">
+                        <label class="flex items-center text-sm">
+                            <input
+                                v-model="selectedElement.required"
+                                type="checkbox"
+                                class="mr-2"
+                            >
+                            Required Field
+                        </label>
+                    </div>
+                </div>
+                <div v-if="selectedElement.type === 'select' || selectedElement.type === 'radio'" class="property-group">
+                    <div class="property-title">Options</div>
+                    <div v-for="(option, index) in selectedElement.options" :key="index" class="flex mb-2">
+                        <input
+                            v-model="option.value"
+                            type="text"
+                            placeholder="Value"
+                            class="form-control mr-2"
+                        >
+                        <input
+                            v-model="option.label"
+                            type="text"
+                            placeholder="Label"
+                            class="form-control mr-2"
+                        >
+                        <button @click="removeOption(index)" class="btn btn-outline btn-sm">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <button @click="addOption" class="btn btn-outline btn-sm w-full">
+                        <i class="fas fa-plus mr-1"></i> Add Option
+                    </button>
+                </div>
+                <div v-if="selectedElement.type === 'button'" class="property-group">
+                    <div class="property-title">Button Settings</div>
+                    <div class="mb-3">
+                        <label class="block text-sm mb-1">Button Type</label>
+                        <select v-model="selectedElement.buttonType" class="form-control">
+                            <option value="submit">Submit</option>
+                            <option value="button">Button</option>
+                            <option value="reset">Reset</option>
+                        </select>
+                    </div>
+                </div>
+                <div v-if="selectedElement.type === 'datepicker' || selectedElement.type === 'timepicker'" class="property-group">
+                    <div class="property-title">Date/Time Settings</div>
+                    <div class="mb-3">
+                        <label class="block text-sm mb-1">Format</label>
+                        <input
+                            v-model="selectedElement.format"
+                            type="text"
+                            class="form-control"
+                            placeholder="Date format (e.g. YYYY-MM-DD)"
+                        >
+                    </div>
+                </div>
+                <div class="property-group">
+                    <div class="property-title">CSS Classes</div>
+                    <div class="mb-3">
+                        <input
+                            v-model="selectedElement.cssClass"
+                            type="text"
+                            class="form-control"
+                            placeholder="Additional CSS classes"
+                        >
+                    </div>
+                </div>
+            </div>
+            <div v-else-if="selectedSection">
+                <div class="property-group">
+                    <div class="property-title">Section Settings</div>
+                    <div class="mb-3">
+                        <label class="block text-sm mb-1">Section Title</label>
+                        <input
+                            v-model="selectedSection.title"
+                            type="text"
+                            class="form-control"
+                            placeholder="Section title"
+                        >
+                    </div>
+                    <div class="checkbox-label">
+                        <input
+                            v-model="selectedSection.hideTitle"
+                            type="checkbox"
+                            id="hide-title-checkbox"
+                        >
+                        <label for="hide-title-checkbox">Hide Section Title</label>
+                    </div>
+                    <div class="mb-3">
+                        <label class="block text-sm mb-1">Description</label>
+                        <textarea
+                            v-model="selectedSection.description"
+                            class="form-control"
+                            rows="2"
+                            placeholder="Section description (optional)"
+                        ></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="flex items-center text-sm">
+                            <input
+                                v-model="selectedSection.collapsible"
+                                type="checkbox"
+                                class="mr-2"
+                            >
+                            Collapsible Section
+                        </label>
+                    </div>
+                    <div v-if="selectedSection.collapsible" class="mb-3">
+                        <label class="flex items-center text-sm">
+                            <input
+                                v-model="selectedSection.collapsedByDefault"
+                                type="checkbox"
+                                class="mr-2"
+                            >
+                            Collapsed by Default
+                        </label>
+                    </div>
+                </div>
+                <div class="property-group">
+                    <div class="property-title">Visibility Rules</div>
+                    <div class="visibility-rule">
+                        <div class="rule-item">
+                            <div class="rule-label">Condition:</div>
+                            <select class="form-control rule-value">
+                                <option>Always visible</option>
+                                <option>Show when field equals</option>
+                                <option>Hide when field equals</option>
+                            </select>
+                        </div>
+                        <div class="rule-item">
+                            <div class="rule-label">Field:</div>
+                            <select class="form-control rule-value">
+                                <option>Select a field</option>
+                                <option v-for="field in getAllFields()" :key="field.name">
+                                    {{ field.label }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="rule-item">
+                            <div class="rule-label">Value:</div>
+                            <input type="text" class="form-control rule-value" placeholder="Enter value">
+                        </div>
+                        <div class="add-rule">
+                            <i class="fas fa-plus mr-1"></i> Add another condition
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div v-else class="text-center py-10 text-gray-500">
+                <i class="fas fa-info-circle text-2xl mb-2"></i>
+                <p>Select an element or section to edit properties</p>
+            </div>
+        </div>
+        <!-- Preview Modal (Now Full-Screen) -->
+        <div v-if="previewMode" class="preview-modal">
+            <div class="preview-header">
+                <h3 class="text-lg font-semibold">Form Preview (Full Screen)</h3>
+                <button @click="previewMode = false" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="preview-body">
+                <div class="max-w-4xl mx-auto"> <!-- Increased max width for better preview -->
+                    <form class="space-y-6">
+                        <div v-for="section in sections" :key="section.id" class="border rounded-lg overflow-hidden">
+                            <div
+                                v-if="!section.hideTitle && (section.title || section.description)"
+                                class="bg-gray-50 px-4 py-3 border-b"
+                            >
+                                <h4 v-if="section.title" class="font-medium text-gray-800">{{ section.title }}</h4>
+                                <p v-if="section.description" class="text-sm text-gray-600 mt-1">{{ section.description }}</p>
+                            </div>
+                            <div class="p-4 md:p-6"> <!-- Increased padding -->
+                                <div v-for="element in section.elements" :key="element.id" class="mb-4 md:mb-5 last:mb-0">
+                                    <label
+                                        v-if="!element.hideLabel && element.label && element.type !== 'button'"
+                                        class="block text-sm font-medium text-gray-700 mb-1"
+                                    >
+                                        {{ element.label }} <span v-if="element.required" class="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        v-if="element.type === 'text' || element.type === 'email' || element.type === 'password'"
+                                        :type="element.type"
+                                        :name="element.name"
+                                        :placeholder="element.placeholder"
+                                        :required="element.required"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                    >
+                                    <textarea
+                                        v-else-if="element.type === 'textarea'"
+                                        :name="element.name"
+                                        :placeholder="element.placeholder"
+                                        :required="element.required"
+                                        rows="4" <!-- Increased default rows -->
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                    ></textarea>
+                                    <select
+                                        v-else-if="element.type === 'select'"
+                                        :name="element.name"
+                                        :required="element.required"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                    >
+                                        <option value="">{{ element.placeholder || 'Select an option' }}</option>
+                                        <option v-for="option in element.options" :key="option.value" :value="option.value">
+                                            {{ option.label }}
+                                        </option>
+                                    </select>
+                                    <div v-else-if="element.type === 'checkbox'" class="flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            :name="element.name"
+                                            :required="element.required"
+                                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                        >
+                                        <label class="ml-2 block text-sm text-gray-700">
+                                            {{ element.label }}
+                                        </label>
+                                    </div>
+                                    <div v-else-if="element.type === 'radio'">
+                                        <div v-for="option in element.options" :key="option.value" class="flex items-center mb-2">
+                                            <input
+                                                type="radio"
+                                                :name="element.name"
+                                                :value="option.value"
+                                                :required="element.required"
+                                                class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                                            >
+                                            <label class="ml-2 block text-sm text-gray-700">
+                                                {{ option.label }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div v-else-if="element.type === 'datepicker'">
+                                        <input
+                                            type="date"
+                                            :name="element.name"
+                                            :required="element.required"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                        >
+                                    </div>
+                                    <div v-else-if="element.type === 'timepicker'">
+                                        <input
+                                            type="time"
+                                            :name="element.name"
+                                            :required="element.required"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                        >
+                                    </div>
+                                    <button
+                                        v-else-if="element.type === 'button'"
+                                        :type="element.buttonType"
+                                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                    >
+                                        {{ element.label }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="preview-footer">
+                <button @click="previewMode = false" class="btn btn-outline">
+                    Close Preview
+                </button>
+            </div>
+        </div>
+        <!-- Export Modal -->
+        <div v-if="showExportModal" class="export-modal">
+            <div class="export-content">
+                <div class="export-header">
+                    <h3 class="text-lg font-semibold">Export Form</h3>
+                    <button @click="showExportModal = false" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="export-tabs">
+                    <div
+                        class="export-tab"
+                        :class="{ 'active': exportTab === 'preview' }"
+                        @click="exportTab = 'preview'"
+                    >
+                        Preview
+                    </div>
+                    <div
+                        class="export-tab"
+                        :class="{ 'active': exportTab === 'code' }"
+                        @click="exportTab = 'code'"
+                    >
+                        HTML Code
+                    </div>
+                     <div
+                        class="export-tab"
+                        :class="{ 'active': exportTab === 'json' }"
+                        @click="exportTab = 'json'"
+                    >
+                        JSON Data
+                    </div>
+                </div>
+                <div class="export-body">
+                    <!-- Preview Tab (Inside Export Modal) -->
+                    <div v-if="exportTab === 'preview'">
+                        <div class="max-w-2xl mx-auto">
+                            <form class="space-y-6">
+                                <div v-for="section in sections" :key="section.id" class="border rounded-lg overflow-hidden">
+                                    <div
+                                        v-if="!section.hideTitle && (section.title || section.description)"
+                                        class="bg-gray-50 px-4 py-3 border-b"
+                                    >
+                                        <h4 v-if="section.title" class="font-medium text-gray-800">{{ section.title }}</h4>
+                                        <p v-if="section.description" class="text-sm text-gray-600 mt-1">{{ section.description }}</p>
+                                    </div>
+                                    <div class="p-4">
+                                        <div v-for="element in section.elements" :key="element.id" class="mb-4 last:mb-0">
+                                            <label
+                                                v-if="!element.hideLabel && element.label && element.type !== 'button'"
+                                                class="block text-sm font-medium text-gray-700 mb-1"
+                                            >
+                                                {{ element.label }} <span v-if="element.required" class="text-red-500">*</span>
+                                            </label>
+                                            <input
+                                                v-if="element.type === 'text' || element.type === 'email' || element.type === 'password'"
+                                                :type="element.type"
+                                                :name="element.name"
+                                                :placeholder="element.placeholder"
+                                                :required="element.required"
+                                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                            >
+                                            <textarea
+                                                v-else-if="element.type === 'textarea'"
+                                                :name="element.name"
+                                                :placeholder="element.placeholder"
+                                                :required="element.required"
+                                                rows="3"
+                                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                            ></textarea>
+                                            <select
+                                                v-else-if="element.type === 'select'"
+                                                :name="element.name"
+                                                :required="element.required"
+                                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                            >
+                                                <option value="">{{ element.placeholder || 'Select an option' }}</option>
+                                                <option v-for="option in element.options" :key="option.value" :value="option.value">
+                                                    {{ option.label }}
+                                                </option>
+                                            </select>
+                                            <div v-else-if="element.type === 'checkbox'" class="flex items-center">
+                                                <input
+                                                    type="checkbox"
+                                                    :name="element.name"
+                                                    :required="element.required"
+                                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                                >
+                                                <label class="ml-2 block text-sm text-gray-700">
+                                                    {{ element.label }}
+                                                </label>
+                                            </div>
+                                            <div v-else-if="element.type === 'radio'">
+                                                <div v-for="option in element.options" :key="option.value" class="flex items-center mb-2">
+                                                    <input
+                                                        type="radio"
+                                                        :name="element.name"
+                                                        :value="option.value"
+                                                        :required="element.required"
+                                                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                                                    >
+                                                    <label class="ml-2 block text-sm text-gray-700">
+                                                        {{ option.label }}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div v-else-if="element.type === 'datepicker'">
+                                                <input
+                                                    type="date"
+                                                    :name="element.name"
+                                                    :required="element.required"
+                                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                                >
+                                            </div>
+                                            <div v-else-if="element.type === 'timepicker'">
+                                                <input
+                                                    type="time"
+                                                    :name="element.name"
+                                                    :required="element.required"
+                                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                                >
+                                            </div>
+                                            <button
+                                                v-else-if="element.type === 'button'"
+                                                :type="element.buttonType"
+                                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                            >
+                                                {{ element.label }}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- HTML Code Tab -->
+                    <div v-if="exportTab === 'code'">
+                        <div class="relative">
+                            <button
+                                @click="copyToClipboard('html')"
+                                class="copy-button"
+                                :class="{ 'btn-primary': !copied.html, 'btn-outline': copied.html }"
+                            >
+                                <i :class="copied.html ? 'fas fa-check' : 'fas fa-copy'"></i>
+                                {{ copied.html ? 'Copied!' : 'Copy' }}
+                            </button>
+                            <pre class="code-block">{{ generatedHTML }}</pre>
+                        </div>
+                    </div>
+                     <!-- JSON Data Tab -->
+                    <div v-if="exportTab === 'json'">
+                        <div class="relative">
+                            <button
+                                @click="copyToClipboard('json')"
+                                class="copy-button"
+                                :class="{ 'btn-primary': !copied.json, 'btn-outline': copied.json }"
+                            >
+                                <i :class="copied.json ? 'fas fa-check' : 'fas fa-copy'"></i>
+                                {{ copied.json ? 'Copied!' : 'Copy' }}
+                            </button>
+                             <button
+                                @click="downloadJson"
+                                class="copy-button" style="right: 60px;"
+                                :class=" 'btn-primary'"
+                            >
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                            <pre class="code-block">{{ generatedJSON }}</pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="export-footer">
+                    <button @click="showExportModal = false" class="btn btn-outline">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Toast Notification -->
+        <div v-if="showToast" class="toast" :class="{ 'error': toastIsError }">
+            <i :class="toastIsError ? 'fas fa-exclamation-circle' : 'fas fa-check-circle'"></i>
+            <span>{{ toastMessage }}</span>
+        </div>
+    </div>
+    <script>
+        const { createApp, ref, watch, computed, onMounted, onUnmounted } = Vue; // Added onMounted, onUnmounted
+        createApp({
+            setup() {
+                // State - Start with empty sections
+                const sections = ref([]);
+                const selectedElement = ref(null);
+                const selectedSection = ref(null);
+                const previewMode = ref(false);
+                const propertiesPanelCollapsed = ref(true);
+                const showExportModal = ref(false);
+                const exportTab = ref('preview');
+                const showToast = ref(false);
+                const toastMessage = ref('');
+                const toastIsError = ref(false);
+                const copied = ref({ html: false, json: false });
+
+                // --- DARK MODE STATE ---
+                const darkMode = ref(false);
+                // --- END DARK MODE STATE ---
+
+                // Drag & Drop State
+                const draggingElement = ref(null);
+                const dragOverSection = ref(null);
+                const dragOverElementIndex = ref(null);
+                const draggedTool = ref(null);
+                const dropProcessed = ref(false);
+
+                // Toolbar items - Added datepicker and timepicker
+                const toolbarItems = [
+                    { type: 'section', label: 'Section', icon: 'fas fa-layer-group' },
+                    { type: 'text', label: 'Text Field', icon: 'fas fa-font' },
+                    { type: 'email', label: 'Email', icon: 'fas fa-envelope' },
+                    { type: 'password', label: 'Password', icon: 'fas fa-lock' },
+                    { type: 'textarea', label: 'Text Area', icon: 'fas fa-align-left' },
+                    { type: 'select', label: 'Dropdown', icon: 'fas fa-caret-square-down' },
+                    { type: 'checkbox', label: 'Checkbox', icon: 'far fa-check-square' },
+                    { type: 'radio', label: 'Radio Group', icon: 'fas fa-dot-circle' },
+                    { type: 'datepicker', label: 'Date Picker', icon: 'fas fa-calendar' },
+                    { type: 'timepicker', label: 'Time Picker', icon: 'fas fa-clock' },
+                    { type: 'button', label: 'Button', icon: 'fas fa-square' }
+                ];
+
+                // Computed property for generated HTML
+                const generatedHTML = computed(() => {
+                    let html = '<form class="lorat-form">';
+                    sections.value.forEach(section => {
+                        if (!section.hideTitle && (section.title || section.description)) {
+                            html += '  <div class="form-section">';
+                            if (section.title) {
+                                html += '    <h3 class="section-title">' + section.title + '</h3>';
+                            }
+                            if (section.description) {
+                                html += '    <p class="section-description">' + section.description + '</p>';
+                            }
+                            html += '  </div>';
+                        }
+                        html += '  <div class="form-elements">';
+                        section.elements.forEach(element => {
+                            if (!element.hideLabel && element.label && element.type !== 'button') {
+                                html += '    <label for="' + element.name + '" class="form-label">' + element.label + (element.required ? ' *' : '') + '</label>';
+                            }
+                            switch(element.type) {
+                                case 'text':
+                                case 'email':
+                                case 'password':
+                                    html += '    <input type="' + element.type + '" name="' + element.name + '" id="' + element.name + '" placeholder="' + (element.placeholder || '') + '"' + (element.required ? ' required' : '') + ' class="form-input">';
+                                    break;
+                                case 'textarea':
+                                    html += '    <textarea name="' + element.name + '" id="' + element.name + '" placeholder="' + (element.placeholder || '') + '" rows="4"' + (element.required ? ' required' : '') + ' class="form-textarea"></textarea>';
+                                    break;
+                                case 'select':
+                                    html += '    <select name="' + element.name + '" id="' + element.name + '"' + (element.required ? ' required' : '') + ' class="form-select">';
+                                    html += '      <option value="">' + (element.placeholder || 'Select an option') + '</option>';
+                                    element.options.forEach(option => {
+                                        html += '      <option value="' + option.value + '">' + option.label + '</option>';
+                                    });
+                                    html += '    </select>';
+                                    break;
+                                case 'checkbox':
+                                    html += '    <div class="form-checkbox">';
+                                    html += '      <input type="checkbox" name="' + element.name + '" id="' + element.name + '"' + (element.required ? ' required' : '') + '>';
+                                    html += '      <label for="' + element.name + '">' + element.label + '</label>';
+                                    html += '    </div>';
+                                    break;
+                                case 'radio':
+                                    html += '    <div class="form-radio-group">';
+                                    element.options.forEach(option => {
+                                        html += '      <div class="form-radio">';
+                                        html += '        <input type="radio" name="' + element.name + '" id="' + element.name + '-' + option.value + '" value="' + option.value + '"' + (element.required ? ' required' : '') + '>';
+                                        html += '        <label for="' + element.name + '-' + option.value + '">' + option.label + '</label>';
+                                        html += '      </div>';
+                                    });
+                                    html += '    </div>';
+                                    break;
+                                case 'datepicker':
+                                    html += '    <input type="date" name="' + element.name + '" id="' + element.name + '"' + (element.required ? ' required' : '') + ' class="form-input">';
+                                    break;
+                                case 'timepicker':
+                                    html += '    <input type="time" name="' + element.name + '" id="' + element.name + '"' + (element.required ? ' required' : '') + ' class="form-input">';
+                                    break;
+                                case 'button':
+                                    html += '    <button type="' + element.buttonType + '" class="form-button">' + element.label + '</button>';
+                                    break;
+                            }
+                        });
+                        html += '  </div>';
+                    });
+                    html += '</form>';
+                    return html;
+                });
+
+                // Computed property for generated JSON
+                const generatedJSON = computed(() => {
+                    return JSON.stringify(sections.value, null, 2);
+                });
+
+                // --- DARK MODE METHODS ---
+                const applyDarkModeClass = (isDark) => {
+                    if (isDark) {
+                        document.documentElement.classList.add('dark-mode');
+                    } else {
+                        document.documentElement.classList.remove('dark-mode');
+                    }
+                };
+
+                const toggleDarkMode = () => {
+                    darkMode.value = !darkMode.value;
+                    localStorage.setItem('loratDarkMode', darkMode.value); // Save preference
+                    applyDarkModeClass(darkMode.value);
+                };
+
+                // Handle system preference changes (optional)
+                const handleSystemThemeChange = (e) => {
+                    // Only apply system theme if user hasn't explicitly set a preference
+                    if (localStorage.getItem('loratDarkMode') === null) {
+                        const systemPrefersDark = e.matches;
+                        darkMode.value = systemPrefersDark;
+                        applyDarkModeClass(systemPrefersDark);
+                    }
+                };
+
+                let mediaQuery;
+                // --- END DARK MODE METHODS ---
+
+                // Watch for property panel changes to adjust canvas
+                watch(propertiesPanelCollapsed, (newVal) => {
+                    setTimeout(() => {
+                        window.dispatchEvent(new Event('resize'));
+                    }, 300);
+                });
+
+                // Methods
+                const handleToolClick = (toolType) => {
+                    if (toolType === 'section') {
+                        addSection();
+                    }
+                };
+                const addSection = (index = sections.value.length) => {
+                    const newSection = {
+                        id: Date.now(),
+                        title: `Section ${sections.value.length + 1}`,
+                        description: '',
+                        collapsed: false,
+                        collapsible: true,
+                        hideTitle: false,
+                        elements: []
+                    };
+                    sections.value.splice(index, 0, newSection);
+                    selectSection(newSection);
+                    selectedElement.value = null;
+                };
+                const deleteSection = (index) => {
+                    sections.value.splice(index, 1);
+                    if (selectedSection.value && selectedSection.value.id === sections.value[index]?.id) {
+                        selectedSection.value = null;
+                    }
+                };
+                const duplicateSection = (section) => {
+                    const newSection = JSON.parse(JSON.stringify(section));
+                    newSection.id = Date.now();
+                    newSection.title = `${section.title} (Copy)`;
+                    sections.value.push(newSection);
+                };
+                const toggleSection = (section) => {
+                    section.collapsed = !section.collapsed;
+                };
+                const addElement = (section, elementType) => {
+                    const newElement = {
+                        id: Date.now(),
+                        type: elementType,
+                        label: getDefaultLabel(elementType),
+                        name: `${elementType}_${Date.now()}`,
+                        placeholder: getDefaultPlaceholder(elementType),
+                        required: false,
+                        icon: getDefaultIcon(elementType),
+                        hideLabel: false,
+                        ...getDefaultProperties(elementType)
+                    };
+                    section.elements.push(newElement);
+                    selectElement(newElement, section);
+                };
+                const getDefaultLabel = (type) => {
+                    const labels = {
+                        text: 'Text Field',
+                        email: 'Email Address',
+                        password: 'Password',
+                        textarea: 'Text Area',
+                        select: 'Dropdown',
+                        checkbox: 'Checkbox',
+                        radio: 'Radio Group',
+                        datepicker: 'Date Picker',
+                        timepicker: 'Time Picker',
+                        button: 'Button'
+                    };
+                    return labels[type] || 'New Element';
+                };
+                const getDefaultPlaceholder = (type) => {
+                    const placeholders = {
+                        text: 'Enter text',
+                        email: 'Enter email',
+                        password: 'Enter password',
+                        textarea: 'Enter text',
+                        select: 'Select an option',
+                        datepicker: 'Select date',
+                        timepicker: 'Select time'
+                    };
+                    return placeholders[type] || '';
+                };
+                const getDefaultIcon = (type) => {
+                    const icons = {
+                        text: 'fas fa-font',
+                        email: 'fas fa-envelope',
+                        password: 'fas fa-lock',
+                        textarea: 'fas fa-align-left',
+                        select: 'fas fa-caret-square-down',
+                        checkbox: 'far fa-check-square',
+                        radio: 'fas fa-dot-circle',
+                        datepicker: 'fas fa-calendar',
+                        timepicker: 'fas fa-clock',
+                        button: 'fas fa-square'
+                    };
+                    return icons[type] || 'fas fa-font';
+                };
+                const getDefaultProperties = (type) => {
+                    switch(type) {
+                        case 'select':
+                        case 'radio':
+                            return {
+                                options: [
+                                    { value: 'option1', label: 'Option 1' },
+                                    { value: 'option2', label: 'Option 2' }
+                                ]
+                            };
+                        case 'button':
+                            return { buttonType: 'submit' };
+                        case 'datepicker':
+                            return {
+                                format: 'YYYY-MM-DD'
+                            };
+                        case 'timepicker':
+                            return {
+                                format: 'HH:mm'
+                            };
+                        default:
+                            return {};
+                    }
+                };
+                const selectElement = (element, section) => {
+                    selectedElement.value = element;
+                    selectedSection.value = section;
+                    propertiesPanelCollapsed.value = false;
+                };
+                const selectSection = (section) => {
+                    selectedSection.value = section;
+                    selectedElement.value = null;
+                    propertiesPanelCollapsed.value = false;
+                };
+                const deleteElement = (section, index) => {
+                    section.elements.splice(index, 1);
+                    if (selectedElement.value && selectedElement.value.id === section.elements[index]?.id) {
+                        selectedElement.value = null;
+                    }
+                };
+                const moveElementUp = (section, index) => {
+                    if (index > 0) {
+                        const temp = section.elements[index];
+                        section.elements[index] = section.elements[index - 1];
+                        section.elements[index - 1] = temp;
+                    }
+                };
+                const moveElementDown = (section, index) => {
+                    if (index < section.elements.length - 1) {
+                        const temp = section.elements[index];
+                        section.elements[index] = section.elements[index + 1];
+                        section.elements[index + 1] = temp;
+                    }
+                };
+                const duplicateElement = (section, element) => {
+                    const newElement = JSON.parse(JSON.stringify(element));
+                    newElement.id = Date.now();
+                    newElement.name = `${element.type}_${Date.now()}`;
+                    section.elements.push(newElement);
+                };
+                const addOption = () => {
+                    if (selectedElement.value && (selectedElement.value.type === 'select' || selectedElement.value.type === 'radio')) {
+                        selectedElement.value.options.push({
+                            value: `option${selectedElement.value.options.length + 1}`,
+                            label: `Option ${selectedElement.value.options.length + 1}`
+                        });
+                    }
+                };
+                const removeOption = (index) => {
+                    if (selectedElement.value && (selectedElement.value.type === 'select' || selectedElement.value.type === 'radio')) {
+                        selectedElement.value.options.splice(index, 1);
+                    }
+                };
+                const getAllFields = () => {
+                    const fields = [];
+                    sections.value.forEach(section => {
+                        section.elements.forEach(element => {
+                            if (element.name && element.label) {
+                                fields.push({
+                                    name: element.name,
+                                    label: element.label
+                                });
+                            }
+                        });
+                    });
+                    return fields;
+                };
+                const exportForm = () => {
+                    showExportModal.value = true;
+                };
+
+                const triggerImport = () => {
+                    document.getElementById('import-json-input').click();
+                };
+
+                const handleImportJson = (event) => {
+                    const file = event.target.files[0];
+                    if (!file) {
+                        return;
+                    }
+                    if (file.type !== "application/json" && !file.name.endsWith('.json')) {
+                         showToastMessage('Please select a valid JSON file.', true);
+                         event.target.value = '';
+                         return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const jsonData = JSON.parse(e.target.result);
+                            if (!Array.isArray(jsonData)) {
+                                throw new Error("Invalid JSON format: Expected an array of sections.");
+                            }
+                            sections.value = jsonData;
+                            selectedElement.value = null;
+                            selectedSection.value = null;
+                            showToastMessage('Form design imported successfully!');
+                        } catch (error) {
+                            console.error("Error importing JSON:", error);
+                            showToastMessage('Failed to import JSON: ' + (error.message || 'Invalid file format.'), true);
+                        } finally {
+                             event.target.value = '';
+                        }
+                    };
+                    reader.onerror = () => {
+                        showToastMessage('Error reading file.', true);
+                        event.target.value = '';
+                    };
+                    reader.readAsText(file);
+                };
+
+                const downloadJson = () => {
+                    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(generatedJSON.value);
+                    const downloadAnchorNode = document.createElement('a');
+                    downloadAnchorNode.setAttribute("href", dataStr);
+                    downloadAnchorNode.setAttribute("download", "lorat_form_design.json");
+                    document.body.appendChild(downloadAnchorNode);
+                    downloadAnchorNode.click();
+                    downloadAnchorNode.remove();
+                };
+
+                const copyToClipboard = (tabType) => {
+                    let textToCopy = '';
+                    if (tabType === 'html') {
+                        textToCopy = generatedHTML.value;
+                    } else if (tabType === 'json') {
+                        textToCopy = generatedJSON.value;
+                    } else {
+                        return;
+                    }
+
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                        if (tabType === 'html') {
+                            copied.value.html = true;
+                        } else if (tabType === 'json') {
+                            copied.value.json = true;
+                        }
+                        showToastMessage(tabType.toUpperCase() + ' code copied to clipboard!');
+                        setTimeout(() => {
+                             if (tabType === 'html') {
+                                copied.value.html = false;
+                            } else if (tabType === 'json') {
+                                copied.value.json = false;
+                            }
+                        }, 2000);
+                    }).catch(err => {
+                        console.error('Failed to copy: ', err);
+                        showToastMessage('Failed to copy to clipboard.', true);
+                    });
+                };
+                const showToastMessage = (message, isError = false) => {
+                    toastMessage.value = message;
+                    toastIsError.value = isError;
+                    showToast.value = true;
+                    setTimeout(() => {
+                        showToast.value = false;
+                        toastIsError.value = false;
+                    }, 3000);
+                };
+
+                // Drag & Drop Methods for Toolbar
+                const startToolDrag = (event, toolType) => {
+                    if (toolType === 'section') {
+                        event.preventDefault();
+                        return;
+                    }
+                    draggedTool.value = toolType;
+                    event.dataTransfer.effectAllowed = 'copy';
+                    event.dataTransfer.setData('text/plain', toolType);
+                };
+
+                const handleSectionDragOver = (event, section) => {
+                    event.preventDefault();
+                    dragOverSection.value = section.id;
+                };
+                const handleSectionDrop = (event, targetSection) => {
+                    event.preventDefault();
+                    dragOverSection.value = null;
+                    if (dropProcessed.value) {
+                        return;
+                    }
+                    dropProcessed.value = true;
+                    const toolType = event.dataTransfer.getData('text/plain');
+                    if (toolType && toolType !== 'section' && toolbarItems.some(item => item.type === toolType)) {
+                        addElement(targetSection, toolType);
+                        draggedTool.value = null;
+                        setTimeout(() => {
+                            dropProcessed.value = false;
+                        }, 100);
+                        return;
+                    }
+                     setTimeout(() => {
+                        dropProcessed.value = false;
+                    }, 100);
+                };
+
+                const startElementDrag = (event, element, section, index) => {
+                    draggingElement.value = element.id;
+                    event.dataTransfer.effectAllowed = 'move';
+                    event.dataTransfer.setData('text/plain', JSON.stringify({
+                        sectionId: section.id,
+                        elementIndex: index
+                    }));
+                };
+                const handleElementDragOver = (event, section, index) => {
+                    event.preventDefault();
+                    dragOverSection.value = section.id;
+                    dragOverElementIndex.value = index;
+                };
+                const handleElementDrop = (event, targetSection, targetIndex) => {
+                    event.preventDefault();
+                    dragOverSection.value = null;
+                    dragOverElementIndex.value = null;
+                    if (dropProcessed.value) {
+                        return;
+                    }
+                    dropProcessed.value = true;
+
+                    const toolType = event.dataTransfer.getData('text/plain');
+                    if (toolType && toolType !== 'section' && toolbarItems.some(item => item.type === toolType)) {
+                        addElement(targetSection, toolType);
+                        draggedTool.value = null;
+                        setTimeout(() => {
+                            dropProcessed.value = false;
+                        }, 100);
+                        return;
+                    }
+
+                    try {
+                        const data = JSON.parse(event.dataTransfer.getData('text/plain'));
+                        const sourceSection = sections.value.find(s => s.id === data.sectionId);
+                        if (sourceSection && sourceSection.elements[data.elementIndex] !== undefined) {
+                            const elementIndexInSource = data.elementIndex;
+                            const elementToMove = sourceSection.elements[elementIndexInSource];
+                            sourceSection.elements.splice(elementIndexInSource, 1);
+
+                            let adjustedTargetIndex = targetIndex;
+                            if (sourceSection.id === targetSection.id && elementIndexInSource < targetIndex) {
+                                adjustedTargetIndex = targetIndex - 1;
+                            }
+
+                            targetSection.elements.splice(adjustedTargetIndex + 1, 0, elementToMove);
+                            selectElement(elementToMove, targetSection);
+
+                            if (sourceSection.elements.length === 0 && sections.value.length > 1) {
+                                selectSection(sourceSection);
+                                selectedElement.value = null;
+                            }
+                        }
+                    } catch (error) {
+                        console.warn('Could not parse element move ', error);
+                         showToastMessage('Error moving element.', true);
+                    }
+
+                    setTimeout(() => {
+                        dropProcessed.value = false;
+                    }, 100);
+                };
+                const endElementDrag = () => {
+                    draggingElement.value = null;
+                    dragOverSection.value = null;
+                    dragOverElementIndex.value = null;
+                    draggedTool.value = null;
+                    setTimeout(() => {
+                        dropProcessed.value = false;
+                    }, 100);
+                };
+
+                // --- LIFECYCLE HOOKS FOR DARK MODE ---
+                onMounted(() => {
+                    // Check for saved preference or system preference on load
+                    const savedDarkMode = localStorage.getItem('loratDarkMode');
+                    if (savedDarkMode !== null) {
+                        darkMode.value = savedDarkMode === 'true';
+                    } else {
+                        // Fallback to system preference
+                        darkMode.value = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    }
+                    applyDarkModeClass(darkMode.value);
+
+                    // Listen for system theme changes (optional)
+                    mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+                    if (mediaQuery.addEventListener) {
+                        mediaQuery.addEventListener('change', handleSystemThemeChange);
+                    } else { // Fallback for older browsers
+                        mediaQuery.addListener(handleSystemThemeChange);
+                    }
+                });
+
+                onUnmounted(() => {
+                    // Clean up listener
+                    if (mediaQuery) {
+                        if (mediaQuery.removeEventListener) {
+                            mediaQuery.removeEventListener('change', handleSystemThemeChange);
+                        } else {
+                            mediaQuery.removeListener(handleSystemThemeChange);
+                        }
+                    }
+                });
+                // --- END LIFECYCLE HOOKS ---
+
+                return {
+                    sections,
+                    selectedElement,
+                    selectedSection,
+                    previewMode,
+                    propertiesPanelCollapsed,
+                    showExportModal,
+                    exportTab,
+                    showToast,
+                    toastMessage,
+                    toastIsError,
+                    copied,
+                    generatedHTML,
+                    generatedJSON,
+                    toolbarItems,
+                    draggingElement,
+                    dragOverSection,
+                    dragOverElementIndex,
+                    draggedTool,
+                    dropProcessed,
+                    // Dark Mode State & Methods
+                    darkMode,
+                    toggleDarkMode,
+                    // Methods
+                    handleToolClick,
+                    addSection,
+                    deleteSection,
+                    duplicateSection,
+                    toggleSection,
+                    addElement,
+                    selectElement,
+                    selectSection,
+                    deleteElement,
+                    moveElementUp,
+                    moveElementDown,
+                    duplicateElement,
+                    addOption,
+                    removeOption,
+                    getAllFields,
+                    exportForm,
+                    triggerImport,
+                    handleImportJson,
+                    downloadJson,
+                    copyToClipboard,
+                    showToastMessage,
+                    startToolDrag,
+                    handleSectionDragOver,
+                    handleSectionDrop,
+                    startElementDrag,
+                    handleElementDragOver,
+                    handleElementDrop,
+                    endElementDrag
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
