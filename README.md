@@ -61,10 +61,6 @@ That's it! The Lorat Form Builder is now ready to use directly in your browser.
 
 Contributions are welcome! Feel free to fork the repository, make changes, and submit pull requests.
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. <!-- If you add a LICENSE file -->
-
 ## Acknowledgments
 
 *   Inspired by the need for simple, no-fuss form building tools.
