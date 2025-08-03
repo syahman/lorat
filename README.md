@@ -64,3 +64,4 @@ Contributions are welcome! Feel free to fork the repository, make changes, and s
 ## Acknowledgments
 
 *   Inspired by the need for simple, no-fuss form building tools.
+*   Frappe.io, Joget Workflow Form Builder.
